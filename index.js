@@ -14,9 +14,13 @@ class Siteswap {
 		// Siteswap notation is case-insensitive, so we make all letters lowercase to be consistent.
 		pattern = pattern.toLowerCase();
 
+		// The string that was inputted (save whitespace removal and lowercasing), for user-facing consistency. In most cases, however, the normalised form will be used instead.
+		this.pattern = pattern;
+
 		// The empty siteswap, ε, is invalid (as are all period-0 siteswaps).
 		if (pattern === "") {
 			this.valid = false;
+			// The empty siteswap has a special name, which is generally deemed to be more helpful than an empty string.
 			this.pattern = "ε";
 			this.period = 0;
 			return;
@@ -109,7 +113,7 @@ class Siteswap {
 			}
 
 			// We can be sure, at this stage, that the period and cardinality are valid, even if there are collisions in the pattern. However, we choose to return the minimal period of a pattern, after normalising, so we do not wish to set the period quite yet. For example, we want the period of 333 to be 1, rather than 3.
-			this.cardinality = cardinality / period;
+			this.cardinality = cardinality /= period;
 
 			// There are many ways to represent the same siteswap. For example, the multiplexes [34] and [43] are isomorphic (although some distinction might be desirable when the props operated on by the events are not identical), and given any action, X, and quantity Y the chain X^Y can be decomposed into a Y-fold repetition of X (among other decompositions). Although the algorithm below can operate on siteswaps of any form, it is helpful to do some normalisation beforehand to decrease the computational cost of validation. The normal form is simply used for validation. The original pattern is conserved for consistency with the user's expectations.
 			// The normal form for a siteswap is defined such that: a) events are ordered from least to greatest within each action; b) any identical adjacent chains of actions or events are combined, and their quantities summed; c) all quantities are non-zero; d) the siteswap has minimal period (for example, 33 is normalised to 3, which is isomorphic).
@@ -243,6 +247,16 @@ class Siteswap {
 
 			// The state before the operation must be the same as the state after the operation. This statement holds if and only if the system of equations is consistent. We've just calculated what the beats in the overlapping range (between the intial state and the state after the operation) must equal in order for the equations to hold. We now just need to check that our assumption, that every beat outside this range is unchanged. If it is not, then for each operation of the sequence, the state is changed, and so the pattern cannot be periodic, which is necessary for the pattern to be valid.
 			this.valid = (period > 0 ? state.slice(-period) : state.slice(0, -period)).every((beat) => beat === 0);
+			if (!this.valid) {
+				return;
+			}
+
+			// We can also check whether the pattern starts off in a ground or excited state. A ground state is one in which it is valid to perform only actions containing events with a value equal to the cardinality of the pattern from this point forth, instead of performing the sequence. For example, the ground state for a cardinality-3 pattern is |1 1 1, whereas the ground state for a pattern with a cardinality of -3 is -1 -1 -1|, where the beat to the right of the bar (|) is the first beat.
+			const limit = Math.abs(min) - (min > 0 ? 1 : -1);
+			// Check whether each state beat in the range adjacent to the beginning, has the same sign as the cardinality of the siteswap, and is a unit.
+			this.ground = Array.from(new Array(state.length), (element, index) => index).every(beat => state[beat] === (beat - limit >= Math.min(0, cardinality) && beat - limit < Math.max(0, cardinality) ? Math.sign(cardinality) : 0));
+			// A state is excited if it is not a ground state.
+			this.excited = !this.ground;
 
 			// Convert the normalised sequence of actions to a string for displaying back to the user.
 			function sequenceToString(sequence, elementToString) {
@@ -265,8 +279,6 @@ class Siteswap {
 				}
 				return substring;
 			});
-			// The exact string that was inputted, for user-facing consistency.
-			this.pattern = pattern;
 		} else {
 			throw new SiteswapError(`The string "${pattern}" is syntactically invalid.`);
 		}
@@ -279,6 +291,8 @@ class Siteswap {
 		siteswap.pattern = void 0;
 		siteswap.period = void 0;
 		siteswap.cardinality = void 0;
+		siteswap.ground = void 0;
+		siteswap.excited = void 0;
 		return siteswap;
 	}
 }

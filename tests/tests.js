@@ -36,7 +36,7 @@ const colours = {
 };
 
 // Test the given pattern to ensure it either validates or invalidates.
-function verifySiteswap (pattern, validate = true, settings = void 0, properties = {}) {
+function verifySiteswap (pattern, validate = true, properties = {}, settings = void 0) {
 	let success;
 	// Siteswaps are disallowed if they cause the validator to throw some sort of error. This means the string that was entered was not in a valid format for a siteswap.
 	let disallowed = true;
@@ -64,13 +64,13 @@ function verifySiteswap (pattern, validate = true, settings = void 0, properties
 }
 
 // Check to make sure the pattern is a valid siteswap.
-function validateSiteswap (pattern, settings = void 0, properties = {}) {
-	return verifySiteswap(pattern, true, settings, properties);
+function validateSiteswap (pattern, properties = {}, settings = void 0) {
+	return verifySiteswap(pattern, true, properties, settings);
 }
 
 // Check to make sure the pattern is invalidated, either because there's a syntax error, or because the siteswap is invalid.
-function invalidateSiteswap (pattern, settings = void 0, properties = {}) {
-	return verifySiteswap(pattern, false, settings, properties);
+function invalidateSiteswap (pattern, properties = {}, settings = void 0) {
+	return verifySiteswap(pattern, false, properties, settings);
 }
 
 // An syntactically invalid pattern.
@@ -78,21 +78,25 @@ invalidateSiteswap("-");
 // The empty siteswap.
 invalidateSiteswap("");
 // A vanilla siteswap.
-validateSiteswap("744", void 0, { period: 3, cardinality: 5 });
+validateSiteswap("744", { period: 3, cardinality: 5 });
 // A vanilla siteswap with a length longer than its actual period.
 validateSiteswap("333");
+// A ground-state siteswap.
+validateSiteswap("531", { ground: true, excited: false });
+// An excited-state siteswap.
+validateSiteswap("91", { ground: false, excited: true });
 // A multiplex siteswap.
 validateSiteswap("[43]23");
 // A negative siteswap (without enabling theoretical siteswaps).
 invalidateSiteswap("-5");
 // A negative siteswap (enabling theoretical siteswaps).
-validateSiteswap("-5", { allowTheoreticalPatterns: true });
+validateSiteswap("-5", void 0, { allowTheoreticalPatterns: true });
 // A siteswap with an exponentiation.
 validateSiteswap("b4^6");
 // A siteswap with a negative cardinality.
-validateSiteswap("5^-1", { allowTheoreticalPatterns: true });
+validateSiteswap("5^-1", void 0, { allowTheoreticalPatterns: true });
 // An invalid period-0 siteswap.
-invalidateSiteswap("11^-1", { allowTheoreticalPatterns: true });
+invalidateSiteswap("11^-1", void 0, { allowTheoreticalPatterns: true });
 // A siteswap with an absurd length.
 invalidateSiteswap("1^{99}20");
 // A simple invalid siteswap.
