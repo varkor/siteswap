@@ -1,0 +1,31 @@
+{
+  "name": "siteswap",
+  "version": "0.1.0",
+  "description": "*siteswap* is a JavaScript library for parsing, validating, analysing and manipulating siteswaps, a succinct notation for juggling patterns.",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "node tests/tests.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/varkor/siteswap.git"
+  },
+  "keywords": [
+    "siteswap",
+    "validator",
+    "parser",
+    "juggling"
+  ],
+  "author": "varkor <npm@varkor.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/varkor/siteswap/issues"
+  },
+  "homepage": "https://github.com/varkor/siteswap#readme",
+  "engines": {
+    "node": ">=6.5.0"
+  }
+}
