@@ -3,7 +3,7 @@
 
 // Import our dependencies.
 const readline = require("readline");
-const { Siteswap } = require("../index.js");
+const {Siteswap} = require("../index.js");
 
 // Just some boilerplate for interfacing with the terminal.
 const rl = readline.createInterface({
