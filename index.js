@@ -463,6 +463,56 @@ class Siteswap {
 		siteswap.theoretical = void 0;
 		return siteswap;
 	}
+
+	static parse (string, options) {
+		// There is no good reason to have case-sensitive parsing, so we force the string to be lowercase.
+		string = string.toLowerCase();
+
+		try {
+			// If the string is already a valid siteswap, we can just use that directly.
+			return new Siteswap(string, options);
+		} catch (error) {
+			// Otherwise, we apply some simple natural language parsing for common siteswaps.
+			const syntax = {};
+			// Patterns are often prefixed with phrases indicating the cardinality of the pattern (such as "5-ball").
+			syntax.cardinality = `(-?\\d+)-(?:prop|ball|ring|club)`;
+			// Generic values are like normal numeric values but accept linear expressions, which can then be specialised given a cardinality.
+			syntax.generic = `{(-?\\d+)?([np])([+-]\\d+)?}`;
+			// Recursive siteswap families build upon the previous pattern (for example, the 4-ball freezeframe is 7531 and the 5-ball freezeframe is 97531).
+			syntax.recursion = `\\.{3}`;
+			// Certain siteswap families have common names (for example "shower" for {2n-1}1 patterns).
+			const families = {
+				"cascade": "{n}",
+				"fountain": "{n}",
+				"high-low shower": "{2n+1}1{2n-3}1",
+				"high-mid-low shower": "{2n+3}1{2n-1}1{2n-5}1",
+				"shower": "{2n-1}1"
+			};
+			syntax.families = `(` + Object.keys(families).join("|") + `)`;
+
+			const matches = string.match(new RegExp(`^${syntax.cardinality} ${syntax.families}$`));
+			if (matches !== null) {
+				const cardinality = parseInt(matches[1]);
+				const family = matches[2];
+				// "Cascade" and "fountain" are special-cased, because they only apply to siteswaps of certain cardinalities, whereas all other siteswap families apply to any integer.
+				if ((family === "cascade" && (cardinality & 1) === 0) || (family === "fountain" && (cardinality & 1) === 1)) {
+					return null;
+				}
+				// Solve the simple linear equations in the family generic slots. We just leave values greater than 9 as numeric rather than alphabetic, for simplicity's sake.
+				const pattern = families[family].replace(new RegExp(`${syntax.generic}`, "g"), (match, multiplier = "1", variable, intercept = "0") => {
+					const value = cardinality * parseInt(multiplier) + parseInt(intercept);
+					return Math.abs(value) < 10 ? `${value}` : `{${value}}`;
+				});
+				try {
+					return new Siteswap(pattern, options);
+				} catch (error) {
+					// Fall through if the natural language pattern was invalidated (because it was theoretical).
+				}
+			}
+		}
+		// If the string could not be matched to a siteswap, we return null.
+		return null;
+	}
 }
 
 module.exports = {

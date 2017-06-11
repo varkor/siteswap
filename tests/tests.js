@@ -38,7 +38,7 @@ const colours = {
 };
 
 // Test the given pattern to ensure it either validates or invalidates.
-function verifySiteswap (pattern, validate = true, properties = {}, settings = void 0) {
+function verifySiteswap (pattern, validate = true, properties = {}, options = void 0) {
 	let success;
 	// Siteswaps are disallowed if they cause the validator to throw some sort of error. This means the string that was entered was not in a valid format for a siteswap.
 	let disallowed = true;
@@ -46,7 +46,7 @@ function verifySiteswap (pattern, validate = true, properties = {}, settings = v
 	let correct = true;
 	let siteswap = null;
 	try {
-		siteswap = new Siteswap(pattern, settings);
+		siteswap = new Siteswap(pattern, options);
 		disallowed = false;
 		// Optionally check that it contains all the specified properties and associated values, for stronger proof of correctness.
 		for (const [property, value] of Object.entries(Object.assign({ valid: true }, properties))) {
@@ -69,13 +69,13 @@ function verifySiteswap (pattern, validate = true, properties = {}, settings = v
 }
 
 // Check to make sure the pattern is a valid siteswap.
-function validateSiteswap (pattern, properties = {}, settings = void 0) {
-	return verifySiteswap(pattern, true, properties, settings);
+function validateSiteswap (pattern, properties = {}, options = void 0) {
+	return verifySiteswap(pattern, true, properties, options);
 }
 
 // Check to make sure the pattern is invalidated, either because there's a syntax error, or because the siteswap is invalid.
-function invalidateSiteswap (pattern, settings = void 0) {
-	return verifySiteswap(pattern, false, void 0, settings);
+function invalidateSiteswap (pattern, options = void 0) {
+	return verifySiteswap(pattern, false, void 0, options);
 }
 
 // An syntactically invalid pattern.
