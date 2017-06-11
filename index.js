@@ -55,8 +55,11 @@ class Siteswap {
 		// We only go on to more thorough validity checks if the input pattern syntactically matches the format of a siteswap.
 		if (new RegExp(`^${syntax.pattern}$`).test(pattern)) {
 			// Negative-value events and negative quantities of events and actions are only permitted if `allowTheoreticalPatterns` is enabled.
-			if (!allowTheoreticalPatterns && /-/.test(pattern)) {
-				throw new SiteswapError(`The pattern "${pattern}" contains negative throws or negative quantities, which are only permitted in theoretical siteswaps.`);
+			if (/-/.test(pattern)) {
+				this.theoretical = true;
+				if (!allowTheoreticalPatterns) {
+					throw new SiteswapError(`The pattern "${pattern}" contains negative throws or negative quantities, which are only permitted in theoretical siteswaps.`);
+				}
 			}
 
 			let period = 0;
@@ -122,8 +125,11 @@ class Siteswap {
 						const value = convertValue(event.element.match(new RegExp(`^${syntax.value}`))[0]);
 						const offset = (event.element.match(new RegExp(`${syntax.cross}`, "g")) || []).length;
 						// Events of the form 0x^n are only permitted if `allowTheoreticalPatterns` is enabled.
-						if (!allowTheoreticalPatterns && value === 0 && offset !== 0) {
-							throw new SiteswapError(`The pattern "${pattern}" contains crossing 0 throws, which are only permitted in theoretical siteswaps.`);
+						if (value === 0 && offset !== 0) {
+							this.theoretical = true;
+							if (!allowTheoreticalPatterns) {
+								throw new SiteswapError(`The pattern "${pattern}" contains crossing 0 throws, which are only permitted in theoretical siteswaps.`);
+							}
 						}
 						events.push({
 							value,
@@ -175,6 +181,11 @@ class Siteswap {
 				throw new SiteswapError(`The pattern "${pattern}" has a throw with an offset greater than or equal to the hand-count.`);
 			}
 			// Note that implicit group actions are left as singleton arrays for now. We want to delay processing them until we have more information regarding the minimal period, to decrease the computational complexity.
+
+			// By this point, we've covered all the cases a siteswap might meet for being theoretical.
+			if (typeof this.theoretical === "undefined") {
+				this.theoretical = false;
+			}
 
 			// Period-0 siteswaps are invalid.
 			if (period === 0) {
@@ -449,6 +460,7 @@ class Siteswap {
 		siteswap.hands = void 0;
 		siteswap.ground = void 0;
 		siteswap.excited = void 0;
+		siteswap.theoretical = void 0;
 		return siteswap;
 	}
 }
