@@ -36,7 +36,11 @@ Installation is easy. First, install via npm, and check everything is working:
 npm install siteswap
 npm test
 ```
-Then include it in your project:
+You can try it out using `examples/prompt.js`:
+```bash
+node examples/prompt.js
+```
+To use it as a library, simply include it in your project:
 ```javascript
 const { Siteswap } = require("siteswap");
 ```

@@ -15,17 +15,17 @@ const rl = readline.createInterface({
 rl.question("Enter a siteswap: ", (pattern) => {
 	try {
 		// Attempt to create a siteswap from the user-supplied string.
-		const siteswap = new Siteswap(pattern);
+		const siteswap = new Siteswap(pattern, { allowTheoreticalPatterns: true });
 		if (siteswap.valid) {
 			// In this case, the siteswap is valid, and we have access to a range of properties, which we can display to the user.
-			console.log(`${siteswap.pattern} is a${siteswap.ground ? " ground" : "n excited"}-state period-${siteswap.period} pattern, juggled with ${siteswap.cardinality} prop${siteswap.cardinality !== 1 ? "s" : ""}.`);
+			console.log(`${siteswap.pattern} is a${siteswap.theoretical ? " theoretical" : ""}${siteswap.ground ? " ground" : "n excited"}-state period-${siteswap.period} pattern, juggled with ${siteswap.cardinality} prop${siteswap.cardinality !== 1 ? "s" : ""}.`);
 		} else {
 			// Here, the siteswap was syntactically correct, but had an issue, either with an invalid number of props or with collisions.
 			console.log(`${pattern} is an invalid siteswap!`);
 		}
 	} catch (error) {
 		// Catch any syntax errors and handle them differently to siteswaps that are simply invalid.
-		console.log(`"${pattern}" is not a siteswap!`);
+		console.log(`"${pattern}" is not a siteswap!\n`, error);
 	}
 	// Clean up after ourselves.
 	rl.close();
