@@ -142,3 +142,5 @@ invalidateSiteswap("(6xx,4xx)");
 validateSiteswap("(6x,4)(4,6x)", { period: 4, cardinality: 5, ground: false, hands: 2 });
 // A siteswap with a starting state that appears like a ground state near the origin.
 validateSiteswap("-1[34]", { period: 2, cardinality: 3, ground: false },  { allowTheoreticalPatterns: true });
+// An siteswap entirely reversed in time.
+validateSiteswap("7445^-12", { period: 3, cardinality: 4, ground: true }, { allowTheoreticalPatterns: true });

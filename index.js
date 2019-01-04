@@ -289,9 +289,8 @@ class Siteswap {
 			this.period = period;
 
 			// Convert implicit group actions to explicit group actions.
-			for (const {index, hand} of implicit) {
+			for (const {hand, group} of implicit) {
 				// Note that this step assumes that if all groups actions are implicit, then we're validating for one hand only (otherwise we might need to repeat the implicit throws to make sure that the pattern cycled properly).
-				const group = groups[index];
 				group.suppression = hands - 1;
 				group.actions.unshift(...Array.from(new Array(hand % hands), () => ({ events: [{ value: 0, offset: 0, quantity: 1 }] })));
 				group.actions.push(...Array.from(new Array(hands - (hand % hands + 1)), () => ({ events: [{ value: 0, offset: 0, quantity: 1 }] })));
